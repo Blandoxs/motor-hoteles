@@ -45,8 +45,9 @@ export default function SearchPanel({ setSearchRunning, setSearchDone, setResult
     setDestino(value)
     if (value.length > 1) {
       const cities = getCities()
-      const filtered = cities.filter(c => c.includes(value.toLowerCase().replace(/\s+/g, '-')))
-      setSuggestions(filtered.length > 0 ? filtered : [])
+      const searchVal = value.toLowerCase().replace(/\s+/g, '-')
+      const filtered = cities.filter(c => c.includes(searchVal)).slice(0, 8) // Mejora: limitar a 8 sugerencias
+      setSuggestions(filtered)
       setShowSuggestions(filtered.length > 0)
     } else {
       setSuggestions([]); setShowSuggestions(false)
@@ -88,6 +89,12 @@ export default function SearchPanel({ setSearchRunning, setSearchDone, setResult
   }
 
   const ejecutarBusqueda = async () => {
+    // Mejora: Validar que el destino no esté vacío
+    if (!destino.trim()) {
+      addLog('ERROR: Debes ingresar un destino válido')
+      return
+    }
+
     setEjecutando(true); setSearchRunning(true); setSearchDone(false); setLog([])
     addLog('Iniciando motor de cotizacion multibuscador...')
 
@@ -164,7 +171,8 @@ export default function SearchPanel({ setSearchRunning, setSearchDone, setResult
             <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center"><Wifi className="w-5 h-5 text-success" /></div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-success">API Real Activa — Makcorps Free Hotel API</p>
-              <p className="text-[10px] text-dark-400">No requiere API Key, no requiere registro. Datos reales de hoteles con precios, fotos y ratings. Endpoint: api.makcorps.com/free/{destino}</p>            </div>
+              <p className="text-[10px] text-dark-400">No requiere API Key, no requiere registro. Datos reales de hoteles con precios, fotos y ratings. Endpoint: api.makcorps.com/free/{destino}</p>
+            </div>
             <a href="https://docs.hotelapi.co/free-hotel-api" target="_blank" rel="noopener" className="text-[10px] text-accent hover:underline">Ver docs →</a>
           </div>
         </div>
@@ -182,7 +190,15 @@ export default function SearchPanel({ setSearchRunning, setSearchDone, setResult
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-dark-900 border border-dark-700 rounded-xl p-4 relative">
             <label className="text-[10px] uppercase tracking-wider text-dark-400 font-medium flex items-center gap-1.5 mb-2"><MapPin className="w-3 h-3" />Ciudad / Destino</label>
-            <input className="w-full bg-dark-800 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent" placeholder="cancun, london, paris, dubai..." value={destino} onChange={handleDestinoChange} onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} onFocus={() => destino.length > 1 && suggestions.length > 0 && setShowSuggestions(true)} />
+            {/* SOLUCIÓN AL ERROR: Cambié el onChange para extraer e.target.value */}
+            <input 
+              className="w-full bg-dark-800 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent" 
+              placeholder="cancun, london, paris, dubai..." 
+              value={destino} 
+              onChange={(e) => handleDestinoChange(e.target.value)} 
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} 
+              onFocus={() => destino.length > 1 && suggestions.length > 0 && setShowSuggestions(true)} 
+            />
             {showSuggestions && (
               <div className="absolute left-4 right-4 top-full mt-1 bg-dark-800 border border-dark-600 rounded-lg shadow-xl z-50 overflow-hidden">
                 {suggestions.map(city => (
@@ -220,7 +236,14 @@ export default function SearchPanel({ setSearchRunning, setSearchDone, setResult
         {menores > 0 && (
           <div className="bg-dark-900 border border-warn/20 rounded-xl p-4 mb-6 animate-fade-up">
             <label className="text-[10px] uppercase tracking-wider text-warn font-medium mb-3 block">Edades de menores (dato critico para tarifa)</label>
-            <div className="flex gap-3">{edadesMenores.map((edad, i) => (<div key={i} className="flex-1"><label className="text-[10px] text-dark-500 block mb-1">Menor {i + 1}</label><input type="number" min="0" max="17" className="w-full bg-dark-800 border border-dark-600 rounded-lg px-3 py-2 text-sm text-white text-center focus:outline-none focus:border-accent" value={edad} onChange={e => setEdad(i, Number(e.target.value))} /></div>))}</div>
+            <div className="flex gap-3">
+              {edadesMenores.map((edad, i) => (
+                <div key={i} className="flex-1">
+                  <label className="text-[10px] text-dark-500 block mb-1">Menor {i + 1}</label>
+                  <input type="number" min="0" max="17" className="w-full bg-dark-800 border border-dark-600 rounded-lg px-3 py-2 text-sm text-white text-center focus:outline-none focus:border-accent" value={edad} onChange={e => setEdad(i, Number(e.target.value))} />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -241,8 +264,12 @@ export default function SearchPanel({ setSearchRunning, setSearchDone, setResult
 
         {/* Ejecutar */}
         <div className="bg-dark-900 border border-dark-700 rounded-xl p-4 flex items-center justify-between">
-          <div className="text-xs text-dark-400"><span className="text-white font-medium">{destino}</span> — {fechaIn} a {fechaOut} — {adultos} adultos{menores > 0 && `, ${menores} menores (${edadesMenores.join(', ')} anos)`}{hotelNombre && ` — "${hotelNombre}"`}</div>
-          <button onClick={ejecutarBusqueda} disabled={ejecutando} className="flex items-center gap-2 bg-accent hover:bg-accent-dark disabled:bg-dark-700 disabled:text-dark-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all">
+          <div className="text-xs text-dark-400 flex-1 mr-4">
+            <span className="text-white font-medium">{destino || 'Sin destino'}</span> — {fechaIn} a {fechaOut} — {adultos} adultos
+            {menores > 0 && `, ${menores} menores (${edadesMenores.join(', ')} anos)`}
+            {hotelNombre && ` — "${hotelNombre}"`}
+          </div>
+          <button onClick={ejecutarBusqueda} disabled={ejecutando || !destino.trim()} className="flex items-center gap-2 bg-accent hover:bg-accent-dark disabled:bg-dark-700 disabled:text-dark-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all">
             {ejecutando ? <><Loader2 className="w-4 h-4 animate-spin" /> Ejecutando...</> : <><Search className="w-4 h-4" /> Ejecutar Busqueda</>}
           </button>
         </div>
