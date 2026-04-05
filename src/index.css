@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+*::-webkit-scrollbar { width: 5px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::selection { background: #3b82f6; color: white; }
+
+@keyframes pulse-glow { 0%,100% { box-shadow: 0 0 4px rgba(59,130,246,0.3); } 50% { box-shadow: 0 0 16px rgba(59,130,246,0.6); } }
+@keyframes scan-line { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+@keyframes fade-up { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+.animate-fade-up { animation: fade-up 0.4s ease-out forwards; }
+.animate-scan { animation: scan-line 1.8s ease-in-out infinite; }
+.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
