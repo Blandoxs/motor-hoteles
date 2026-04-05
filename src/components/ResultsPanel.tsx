@@ -81,7 +81,7 @@ export default function ResultsPanel({ results, providerStatuses }: Props) {
             <p className="text-xs text-dark-400">{best.direccion}{best.landmark && ` — ${best.landmark}`}</p>
             <div className="flex items-center gap-3 mt-2">
               {/* Corregido: Separado correctamente para que imprima las variables */}
-              <span className="text-2xl font-bold text-success">${best.total} {best.moneda}</span>
+              <span className="text-2xl font-bold text-success">${best.total} {String(best.moneda)}</span>
               {best.estrellas > 0 && (
                 <>
                   {renderStars(best.estrellas)}
@@ -253,7 +253,7 @@ export default function ResultsPanel({ results, providerStatuses }: Props) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-dark-300">Precio base</span>
-                    <span className="font-mono text-white">${selectedHotel.precio.toLocaleString()} {selectedHotel.moneda}</span>
+                    <span className="font-mono text-white">${Number(selectedHotel.precio).toLocaleString()} {String(selectedHotel.moneda)}</span>
                   </div>
                   <div className="flex justify-between border-t border-dark-700 pt-2">
                     <span className="text-dark-300">Impuestos (17%)</span>
