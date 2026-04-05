@@ -48,7 +48,6 @@ export default function ResultsPanel({ results, providerStatuses }: Props) {
         </div>
         <div className="bg-dark-900 border border-dark-700 rounded-xl p-4">
           <p className="text-[10px] text-dark-400 uppercase">Mejor Precio</p>
-          {/* Corregido: Uso de concatenación en lugar de template literal */}
           <p className="text-2xl font-bold text-success mt-1">{best ? "$" + best.total : '—'}</p>
         </div>
         <div className="bg-dark-900 border border-dark-700 rounded-xl p-4">
@@ -80,7 +79,6 @@ export default function ResultsPanel({ results, providerStatuses }: Props) {
             <h3 className="text-lg font-bold text-white">{best.hotel}</h3>
             <p className="text-xs text-dark-400">{best.direccion}{best.landmark && ` — ${best.landmark}`}</p>
             <div className="flex items-center gap-3 mt-2">
-              {/* Corregido: Separado correctamente para que imprima las variables */}
               <span className="text-2xl font-bold text-success">${best.total} {String(best.moneda)}</span>
               {best.estrellas > 0 && (
                 <>
@@ -229,7 +227,7 @@ export default function ResultsPanel({ results, providerStatuses }: Props) {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-xl font-bold text-white">{selectedHotel.hotel}</h3>
-                  {selectedHotel.real && <span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success font-semibold inline-block mt-1">DATOS REALES DE MAKCORPS</span>}
+                  {selectedHotel.real && <span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success font-semibold inline-block mt-1">DATOS REALES</span>}
                 </div>
                 {selectedHotel.estrellas > 0 && (
                   <div className="flex items-center gap-2 mt-2">
@@ -265,8 +263,35 @@ export default function ResultsPanel({ results, providerStatuses }: Props) {
                   </div>
                 </div>
               </div>
+              
+              {/* BOTONES DE ACCIÓN */}
               <div className="flex items-center gap-4 mt-4">
                 <button onClick={() => setSelectedHotel(null)} className="flex-1 bg-dark-800 border border-dark-700 px-4 py-2.5 rounded-xl text-xs text-dark-300 hover:bg-dark-700 transition-colors">Cerrar</button>
+                
+                {/* NUEVO BOTÓN DE RESERVAR */}
+                <button onClick={() => {
+                  const nombre = prompt("Nombre del Cliente:");
+                  if(!nombre) return;
+                  const email = prompt("Email del Cliente:");
+                  const telefono = prompt("Teléfono del Cliente:");
+                  
+                  const nuevaReservacion = {
+                    id: Date.now().toString(),
+                    fechaCreacion: new Date().toISOString(),
+                    cliente: { nombre, email: email || '', telefono: telefono || '' },
+                    hotel: selectedHotel,
+                    estado: 'pendiente'
+                  };
+                  
+                  const existing = JSON.parse(localStorage.getItem('reservaciones_app') || '[]');
+                  existing.push(nuevaReservacion);
+                  localStorage.setItem('reservaciones_app', JSON.stringify(existing));
+                  alert('Reservación guardada con éxito en el Lobby.');
+                  setSelectedHotel(null);
+                }} className="flex-1 bg-success/10 border border-success/30 px-4 py-2.5 rounded-xl text-xs text-success hover:bg-success/20 transition-colors font-semibold">
+                  Guardar Reservación
+                </button>
+
                 <a 
                   href={`https://www.google.com/search?q=${encodeURIComponent(selectedHotel.hotel + ' ' + (selectedHotel.direccion || ''))}`} 
                   target="_blank" 
@@ -277,6 +302,7 @@ export default function ResultsPanel({ results, providerStatuses }: Props) {
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
+              
               <div className="flex items-center gap-2 text-xs text-dark-400 mt-4">
                 <span className="font-mono">Portal:</span><span className="text-white">{selectedHotel.proveedor}</span>
                 <span className="font-mono">ID:</span><span className="text-dark-300">{selectedHotel.hotelId}</span>

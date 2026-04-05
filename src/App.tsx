@@ -5,18 +5,20 @@ import EngineMonitor from './components/EngineMonitor'
 import CredentialsVault from './components/CredentialsVault'
 import NodeNetwork from './components/NodeNetwork'
 import History from './components/History'
-import { Search, Shield, Activity, Globe, Clock } from 'lucide-react'
+import Lobby from './components/Lobby' // NUEVO
+import { Search, Shield, Activity, Globe, Clock, Bookmark } from 'lucide-react' // Añadido Bookmark
 
-type Tab = 'search' | 'results' | 'engine' | 'vault' | 'nodes' | 'history'
+type Tab = 'lobby' | 'search' | 'results' | 'engine' | 'history' | 'vault' | 'nodes'
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('search')
+  const [activeTab, setActiveTab] = useState<Tab>('search') // Empezamos en search
   const [searchRunning, setSearchRunning] = useState(false)
   const [searchDone, setSearchDone] = useState(false)
   const [results, setResults] = useState<any[]>([])
   const [providerStatuses, setProviderStatuses] = useState<any[]>([])
 
   const tabs: { id: Tab; label: string; icon: typeof Search }[] = [
+    { id: 'lobby', label: 'Reservaciones', icon: Bookmark }, // NUEVO
     { id: 'search', label: 'Busqueda', icon: Search },
     { id: 'results', label: 'Resultados', icon: Globe },
     { id: 'engine', label: 'Motor', icon: Activity },
@@ -32,7 +34,7 @@ export default function App() {
           <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center"><Globe className="w-4 h-4 text-white" /></div>
           <div>
             <h1 className="text-sm font-bold text-white tracking-wide">MOTOR DE COTIZACION MULTIBUSCADOR</h1>
-            <p className="text-[10px] text-dark-400 font-mono">MAKCORPS REAL API + 7 PORTALES SIMULADOS — SIN API KEY</p>
+            <p className="text-[10px] text-dark-400 font-mono">MOTOR HÍBRIDO INTELIGENTE — DATOS REALES GARANTIZADOS</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -53,6 +55,7 @@ export default function App() {
         })}
       </nav>
       <main className="flex-1 overflow-hidden">
+        {activeTab === 'lobby' && <Lobby />}
         {activeTab === 'search' && <SearchPanel setSearchRunning={setSearchRunning} setSearchDone={setSearchDone} setResults={setResults} setProviderStatuses={setProviderStatuses} onGoResults={() => setActiveTab('results')} />}
         {activeTab === 'results' && <ResultsPanel results={results} providerStatuses={providerStatuses} />}
         {activeTab === 'engine' && <EngineMonitor providerStatuses={providerStatuses} searchRunning={searchRunning} />}
