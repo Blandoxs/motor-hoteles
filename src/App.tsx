@@ -5,20 +5,22 @@ import EngineMonitor from './components/EngineMonitor'
 import CredentialsVault from './components/CredentialsVault'
 import NodeNetwork from './components/NodeNetwork'
 import History from './components/History'
-import Lobby from './components/Lobby' // NUEVO
-import { Search, Shield, Activity, Globe, Clock, Bookmark } from 'lucide-react' // Añadido Bookmark
+import Lobby from './components/Lobby'
+import TravelPlanner from './components/TravelPlanner'
+import { Search, Shield, Activity, Globe, Clock, Bookmark, Plane } from 'lucide-react'
 
-type Tab = 'lobby' | 'search' | 'results' | 'engine' | 'history' | 'vault' | 'nodes'
+type Tab = 'lobby' | 'travel' | 'search' | 'results' | 'engine' | 'history' | 'vault' | 'nodes'
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('search') // Empezamos en search
+  const [activeTab, setActiveTab] = useState<Tab>('search')
   const [searchRunning, setSearchRunning] = useState(false)
   const [searchDone, setSearchDone] = useState(false)
   const [results, setResults] = useState<any[]>([])
   const [providerStatuses, setProviderStatuses] = useState<any[]>([])
 
   const tabs: { id: Tab; label: string; icon: typeof Search }[] = [
-    { id: 'lobby', label: 'Reservaciones', icon: Bookmark }, // NUEVO
+    { id: 'lobby', label: 'Reservaciones', icon: Bookmark },
+    { id: 'travel', label: 'Viajes Int.', icon: Plane },
     { id: 'search', label: 'Busqueda', icon: Search },
     { id: 'results', label: 'Resultados', icon: Globe },
     { id: 'engine', label: 'Motor', icon: Activity },
@@ -56,6 +58,7 @@ export default function App() {
       </nav>
       <main className="flex-1 overflow-hidden">
         {activeTab === 'lobby' && <Lobby />}
+        {activeTab === 'travel' && <TravelPlanner />}
         {activeTab === 'search' && <SearchPanel setSearchRunning={setSearchRunning} setSearchDone={setSearchDone} setResults={setResults} setProviderStatuses={setProviderStatuses} onGoResults={() => setActiveTab('results')} />}
         {activeTab === 'results' && <ResultsPanel results={results} providerStatuses={providerStatuses} />}
         {activeTab === 'engine' && <EngineMonitor providerStatuses={providerStatuses} searchRunning={searchRunning} />}
