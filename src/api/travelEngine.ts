@@ -1,112 +1,131 @@
-// Base de datos de destinos internacionales con itinerarios reales
-const DESTINATIONS_DB: Record<string, { country: string; currency: string; dailyCost: number; flightBaseCost: number; itinerary: { day: number; title: string; description: string }[] }> = {
-  'japon': {
-    country: 'Japón', currency: 'JPY', dailyCost: 80, flightBaseCost: 1800,
-    itinerary: [
-      { day: 1, title: 'Llegada a Tokio', description: 'Traslado al hotel en Shinjuku. Paseo por la iluminación nocturna de Shibuya.' },
-      { day: 2, title: 'Tokio Tradicional', description: 'Visita al templo Senso-ji en Asakusa y recorrido por el Palacio Imperial.' },
-      { day: 3, title: 'Tokio Moderno', description: 'Akihabara, distrito tecnológico. Cruce famoso en Shibuya y compras en Harajuku.' },
-      { day: 4, title: 'Viaje a Kioto', description: 'Viaje en Shinkansen (Tren bala). Llegada y visita al bosque de Bambú de Arashiyama.' },
-      { day: 5, title: 'Kioto Histórico', description: 'Templo Kinkaku-ji (Pabellón Dorado) y barrio de Geishas en Gion.' },
-      { day: 6, title: 'Osaka', description: 'Viaje a Osaka. Castillo de Osaka y calle Dotonbori para gastronomía.' }
-    ]
-  },
-  'madrid': {
-    country: 'España', currency: 'EUR', dailyCost: 60, flightBaseCost: 900,
-    itinerary: [
-      { day: 1, title: 'Llegada a Madrid', description: 'Check-in. Paseo por la Gran Vía y visita a la Puerta del Sol.' },
-      { day: 2, title: 'Arte y Cultura', description: 'Museo del Prado y paseo por el Retiro (Barco y Cristal Palace).' },
-      { day: 3, title: 'Madrid Histórico', description: 'Palacio Real, Catedral de la Almudena y mercado de San Miguel.' },
-      { day: 4, title: 'Toledo (Excursión)', description: 'Viaje en tren AVE a Toledo. Ciudad de las tres culturas.' }
-    ]
-  },
-  'paris': {
-    country: 'Francia', currency: 'EUR', dailyCost: 70, flightBaseCost: 950,
-    itinerary: [
-      { day: 1, title: 'Llegada a París', description: 'Traslado, cruce del Sena y primera vista de la Torre Eiffel de noche.' },
-      { day: 2, title: 'Iconos de París', description: 'Visita a la Torre Eiffel, paseo por los Campos Elíseos y Arco del Triunfo.' },
-      { day: 3, title: 'Museos', description: 'Museo del Louvre (Mona Lisa) y paseo por el barrio de Montmartre.' },
-      { day: 4, title: 'Versalles', description: 'Excursión de medio día al Palacio de Versalles y sus jardines.' }
-    ]
-  },
-  'new york': {
-    country: 'Estados Unidos', currency: 'USD', dailyCost: 90, flightBaseCost: 600,
-    itinerary: [
-      { day: 1, title: 'Llegada a NYC', description: 'Times Square al estilo debutante y cena en Manhattan.' },
-      { day: 2, title: 'Estatua y Downtown', description: 'Ferry a la Estatua de la Libertad, Wall Street y Memorial 9/11.' },
-      { day: 3, title: 'Arte y Central Park', description: 'Museo MET, caminata por Central Park y Fifth Avenue.' },
-      { day: 4, title: 'Brooklyn', description: 'Cruce del Brooklyn Bridge, DUMBO y pizza auténtica en Brooklyn.' }
-    ]
-  },
-  'cancun': {
-    country: 'México', currency: 'MXN', dailyCost: 50, flightBaseCost: 200,
-    itinerary: [
-      { day: 1, title: 'Llegada a Cancún', description: 'Check-in en zona hotelera, relax en la playa.' },
-      { day: 2, title: 'Isla Mujeres', description: 'Ferry a Isla Mujeres, snorkel y playa Norte.' },
-      { day: 3, title: 'Riviera Maya', description: 'Excursión a Xcaret o Xel-Há (Parques eco-arqueológicos).' }
-    ]
-  }
+// ==========================================
+// MOTOR MULTICIUDAD + MAKCORPS + WIKIPEDIA
+// ==========================================
+
+const COUNTRIES_DB: Record<string, { cities: { name: string, makcorpsQuery: string, days: number, activities: string[] }[] }> = {
+  'japon': { cities: [
+    { name: 'Tokyo', makcorpsQuery: 'tokyo', days: 3, activities: ['Templo Senso-ji en Asakusa', 'Cruce de Shibuya', 'Akihabara (Distrito Tecnológico)', 'Palacio Imperial'] },
+    { name: 'Kyoto', makcorpsQuery: 'kyoto', days: 2, activities: ['Fushimi Inari (Torii Rojos)', 'Bosque de Bambú de Arashiyama', 'Templo Kinkaku-ji (Pabellón Dorado)'] },
+    { name: 'Osaka', makcorpsQuery: 'osaka', days: 2, activities: ['Castillo de Osaka', 'Calle gastronómica Dotonbori', 'Acuario Kaiyukan'] }
+  ]},
+  'mexico': { cities: [
+    { name: 'Cancun', makcorpsQuery: 'cancun', days: 3, activities: ['Zona Hotelera', 'Isla Mujeres', 'Parque Xcaret'] },
+    { name: 'Playa del Carmen', makcorpsQuery: 'playa-del-carmen', days: 2, activities: ['Quinta Avenida', 'Cenotes snorkel', 'Ruinas de Tulum'] },
+    { name: 'Mexico City', makcorpsQuery: 'mexico-city', days: 2, activities: ['Zócalo y Palacio Nacional', 'Museo de Antropología', 'Coyoacán y Frida Kahlo'] }
+  ]},
+  'europa': { cities: [
+    { name: 'Paris', makcorpsQuery: 'paris', days: 3, activities: ['Torre Eiffel', 'Museo del Louvre', 'Barrio de Montmartre'] },
+    { name: 'Madrid', makcorpsQuery: 'madrid', days: 2, activities: ['Museo del Prado', 'Palacio Real', 'Mercado de San Miguel'] },
+    { name: 'Roma', makcorpsQuery: 'rome', days: 2, activities: ['Coliseo Romano', 'Vaticano y Capilla Sixtina', 'Fontana de Trevi'] }
+  ]}
 };
 
-// Lógica de cálculo de vuelos según origen
-function calculateFlightCost(origin: string, baseCost: number): number {
-  const originLower = origin.toLowerCase();
-  const isMexico = originLower.includes('mexico') || originLower.includes('chihuahua') || originLower.includes('juarez') || originLower.includes('cdmx') || originLower.includes('monterrey');
+// Llamada a Makcorps
+async function fetchMakcorps(cityQuery: string) {
+  try {
+    const res = await fetch(`https://api.makcorps.com/free/${cityQuery}`);
+    if (!res.ok) throw new Error('Makcorps 404');
+    const json = await res.json();
+    return json.data || json.payload?.hotels || json.hotels || json || [];
+  } catch (e) {
+    return []; // Si falla, usaremos OSM
+  }
+}
+
+// Llamada a OpenStreetMap (Open Data puro, sin API Key)
+async function fetchOSMHotels(city: string) {
+  try {
+    const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`);
+    const geoData = await geoRes.json();
+    if (!geoData.length) return [];
+    const query = `[out:json][timeout:10];(node["tourism"="hotel"](around:10000,${geoData[0].lat},${geoData[0].lon}););out body;`;
+    const hotelRes = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+    const hotelData = await hotelRes.json();
+    return hotelData.elements.filter(el => el.tags?.name).map(el => el.tags.name).slice(0, 6);
+  } catch (e) { return []; }
+}
+
+export interface RoomOption { id: string; plan: string; price: number; type: string; }
+export interface HotelOption { id: string; name: string; image: string; rooms: RoomOption[]; isReal: boolean; }
+export interface CityPlan { name: string; days: number; activities: string[]; hotels: HotelOption[]; }
+export interface FlightOption { id: string; airline: string; priceUSD: number; url: string; }
+export interface TravelPlan { origin: string; country: string; startDate: string; cities: CityPlan[]; flight: FlightOption; }
+
+export async function generateTravelPlan(origin: string, country: string, startDate: string): Promise<TravelPlan> {
+  const countryKey = country.toLowerCase().trim();
+  const countryData = COUNTRIES_DB[countryKey] || { cities: [{ name: country, makcorpsQuery: country, days: 5, activities: ['Explorar centro histórico', 'Visitar museos locales', 'Gastronomía típica'] }] };
   
-  if (isMexico) {
-    if (baseCost <= 300) return baseCost + Math.round(Math.random() * 100); // Vuelos nacionales
-    return baseCost + 200 + Math.round(Math.random() * 300); // Latam -> Internacional
-  }
-  return baseCost; // Resto del mundo
-}
+  const vary = () => 0.9 + Math.random() * 0.2;
+  const baseFlight = countryKey === 'mexico' ? 150 : countryKey === 'europa' ? 900 : 1400;
 
-export interface TravelPlan {
-  origin: string;
-  destination: string;
-  country: string;
-  days: number;
-  flightCostUSD: number;
-  dailyCostUSD: number;
-  hotelCostUSD: number;
-  totalCostUSD: number;
-  itinerary: { day: number; title: string; description: string }[];
-}
-
-export function generateTravelPlan(origin: string, destination: string, days: number): TravelPlan | null {
-  const destKey = destination.toLowerCase().trim();
-  const destData = DESTINATIONS_DB[destKey];
-
-  if (!destData) return null; // Destino no soportado
-
-  // Ajustar itinerario si piden más o menos días
-  const maxDays = destData.itinerary.length;
-  const finalDays = Math.min(days, maxDays);
-  const adjustedItinerary = destData.itinerary.slice(0, finalDays);
-
-  // Si piden más días de los que hay, rellenamos con "Día Libre"
-  for (let i = finalDays; i < days; i++) {
-    adjustedItinerary.push({ day: i + 1, title: `Día Libre en ${destData.country}`, description: 'Día libre para explorar, compras o descansar.' });
-  }
-
-  const flightCost = calculateFlightCost(origin, destData.flightBaseCost);
-  const dailyCost = destData.dailyCost * days;
-  const hotelCost = (destData.dailyCost * 0.8) * days; // El hotel suele ser 80% del costo diario
-  const total = flightCost + dailyCost + hotelCost;
-
-  return {
-    origin, destination, country: destData.country, days,
-    flightCostUSD: flightCost,
-    dailyCostUSD: dailyCost,
-    hotelCostUSD: hotelCost,
-    totalCostUSD: total,
-    itinerary: adjustedItinerary
+  // Vuelo principal
+  const flight: FlightOption = {
+    id: 'fl-1', airline: countryKey === 'mexico' ? 'Volaris / Aeromexico' : 'American Airlines / Lufthansa',
+    priceUSD: Math.round(baseFlight * vary()),
+    url: `https://www.google.com/search?q=vuelos+${origin}+a+${country}`
   };
-}
 
-export function getAvailableDestinations() {
-  return Object.keys(DESTINATIONS_DB).map(key => ({
-    id: key,
-    name: DESTINATIONS_DB[key].country,
-    baseFlight: DESTINATIONS_DB[key].flightBaseCost
-  }));
+  // Procesar cada ciudad en paralelo
+  const citiesPromises = countryData.cities.map(async (city) => {
+    const makcorpsData = await fetchMakcorps(city.makcorpsQuery);
+    let hotels: HotelOption[] = [];
+
+    // Si Makcorps respondió, extraer HOTELES con MÚLTIPLES HABITACIONES
+    if (makcorpsData.length > 0) {
+      hotels = makcorpsData.slice(0, 5).map((h: any, i: number) => {
+        const name = h.hotelName || h.propertyName || h.name || 'Hotel Real';
+        const image = h.media?.heroImage || h.image || '';
+        
+        // Extraer múltiples opciones de habitación (Rooms)
+        let rooms: RoomOption[] = [];
+        if (Array.isArray(h.rooms) && h.rooms.length > 0) {
+          rooms = h.rooms.map((r: any, rIdx: number) => {
+            let price = 0;
+            if (r.price && typeof r.price === 'object') price = Number(r.price.amount || r.price.total || 0);
+            else if (typeof r.price === 'number') price = r.price;
+            else price = 100 + rIdx * 50;
+            
+            return {
+              id: `r-${i}-${rIdx}`,
+              plan: String(r.roomName || r.boardType || r.plan || `Habitación ${rIdx + 1}`).toUpperCase(),
+              price: Math.round(price * vary()),
+              type: rIdx === 0 ? 'Económica' : rIdx === 1 ? 'Estándar' : 'Premium/Suite'
+            };
+          });
+        } else {
+          // Si el hotel no tiene habitaciones separadas, inventamos 3 opciones de precio
+          const baseP = Number(h.minPrice || h.price?.amount || 120);
+          rooms = [
+            { id: `r-${i}-0`, plan: 'HABITACIÓN ESTÁNDAR', price: Math.round(baseP * vary()), type: 'Económica' },
+            { id: `r-${i}-1`, plan: 'HABITACIÓN SUPERIOR', price: Math.round((baseP * 1.4) * vary()), type: 'Estándar' },
+            { id: `r-${i}-2`, plan: 'SUITE O JUNIOR', price: Math.round((baseP * 2.2) * vary()), type: 'Premium/Suite' }
+          ];
+        }
+
+        return { id: `ht-${i}`, name, image, rooms, isReal: true };
+      });
+    } else {
+      // FALLBACK: Usar OpenStreetMap y simular habitaciones
+      const osmNames = await fetchOSMHotels(city.name);
+      const fallbackNames = osmNames.length > 0 ? osmNames : [`Hotel Central ${city.name}`, `Grand Plaza ${city.name}`];
+      hotels = fallbackNames.map((name, i) => {
+        const baseP = 80 + i * 60;
+        return {
+          id: `ht-fb-${i}`, name, image: '',
+          rooms: [
+            { id: `rfb-${i}-0`, plan: 'HABITACIÓN ESTÁNDAR', price: Math.round(baseP * vary()), type: 'Económica' },
+            { id: `rfb-${i}-1`, plan: 'HABITACIÓN DOBLE', price: Math.round((baseP * 1.5) * vary()), type: 'Estándar' },
+            { id: `rfb-${i}-2`, plan: 'SUITE', price: Math.round((baseP * 2.5) * vary()), type: 'Premium/Suite' }
+          ],
+          isReal: osmNames.length > 0
+        };
+      });
+    }
+
+    return { ...city, hotels };
+  });
+
+  const cities = await Promise.all(citiesPromises);
+
+  return { origin, country, startDate, cities, flight };
 }
